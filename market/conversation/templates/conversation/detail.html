@@ -8,13 +8,47 @@
 
 <div class="space-y-6">
     {% for message in conversation.messages.all %}
+
         <div class="p-6 flex {% if message.created_by == request.user %}bg-blue-100{% else %}bg-gray-100{% endif %} rounded-xl">
             <div>
-                <p class="mb-4"><strong>{{ message.created_by.username }}</strong> @ {{ message.created_at }}</p>
-                <p>{{ message.content }}</p>
+                
+                <p class="mb-4"><strong>{{ message.created_by.username }}</strong> <u>@ {{ message.created_at }}</u>
+                {% if message.created_by == request.user %}
+                    <span class="ml-4 text-sm {% if message.is_read %}text-green-600{% else %}text-red-600{% endif %}">
+                        {% if message.is_read %}
+                            (Read)
+                        {% else %}
+                            (Unread)
+                        {% endif %}
+                    </span>
+                    <p>{{ message.content }}</p> <br><br><br>
+                </p>
+
+                
+                 {% else%}
+
+                    
+                    <p>{{ message.content }}</p> <br><br><br>
+                
+                    <form method="post" class="mt-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="message_id" value="{{ message.id }}">
+                        <label>
+                            <input type="checkbox" name="is_read" {% if message.is_read %}checked{% endif %}>
+                            Mark as Read
+                        </label>
+                        <button type="submit"></button>
+                    </form>
+            {% endif %} 
+
+            
+            
             </div>
+            
         </div>
+        
     {% endfor %}
+                    
 </div>
 
 <form method="post" action="." class="mt-6">

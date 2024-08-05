@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from item.models import Item
 
 from .forms import ConversationMessageForm
-from .models import Conversation
+from .models import *
 
 @login_required
 def new_conversation(request, item_pk):
@@ -44,10 +44,35 @@ def new_conversation(request, item_pk):
 @login_required
 def inbox(request):
     conversations = Conversation.objects.filter(members__in=[request.user.id])
+    # initial = conversations
+    print(conversations)
+    print(conversations.count())
+    conMessage = ConversationMessage.objects.filter().order_by('created_at')
+
+    #count no of unread messages
+    unread_count = ConversationMessage.objects.filter(is_read=False).count()
 
     return render(request, 'conversation/inbox.html', {
-        'conversations': conversations
+        'conversations': conversations,
+        'conMessage': conMessage,
+        'unread_count': unread_count
+
     })
+
+# print(conMessage)
+# print(unread_count)
+
+def read_messages(request, conversation_id):
+    conversation = get_object_or_404(Conversation, id=conversation_id)
+    
+    if request.method == 'POST':
+        read = request.POST.get('is_read') == 'on'
+        ConversationMessage.is_read = read
+        ConversationMessage.save()
+
+        
+
+    return redirect('inbox')
 
 @login_required
 def detail(request, pk):
@@ -72,3 +97,6 @@ def detail(request, pk):
         'conversation': conversation,
         'form': form
     })
+
+
+

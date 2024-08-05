@@ -10,7 +10,7 @@ class Conversation(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ('-modified_at',)
+        ordering = ('-created_at',)
 
 
 class ConversationMessage(models.Model):
@@ -18,3 +18,10 @@ class ConversationMessage(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, related_name='created_messages', on_delete=models.CASCADE)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        return f"Message from {self.created_by}"
